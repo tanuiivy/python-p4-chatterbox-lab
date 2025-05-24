@@ -131,19 +131,20 @@ class TestApp:
             db.session.commit()
 
     def test_deletes_message_from_database(self):
-        '''deletes the message from the database.'''
         with app.app_context():
-
             hello_from_liza = Message(
                 body="Hello 👋",
                 username="Liza")
-            
+        
             db.session.add(hello_from_liza)
             db.session.commit()
 
-            app.test_client().delete(
+            response = app.test_client().delete(
                 f'/messages/{hello_from_liza.id}'
-            )
+        )
+
+            assert response.status_code == 200
+            assert response.json == {"message": "Deleted successfully"}
 
             h = Message.query.filter_by(body="Hello 👋").first()
-            assert(not h)
+            assert not h
